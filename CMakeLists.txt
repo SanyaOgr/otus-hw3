@@ -12,10 +12,10 @@ endif()
 project ("otus-hw3")
 
 # Добавьте источник в исполняемый файл этого проекта.
-add_executable (otus-hw3 "ip_filter.cpp")
+add_executable (ip_filter "ip_filter.cpp")
 
 if (CMAKE_VERSION VERSION_GREATER 3.12)
-  set_property(TARGET otus-hw3 PROPERTY CXX_STANDARD 20)
+  set_property(TARGET ip_filter PROPERTY CXX_STANDARD 20)
 endif()
 
 # TODO: Добавьте тесты и целевые объекты, если это необходимо.
