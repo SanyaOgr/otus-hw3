@@ -1,7 +1,4 @@
-﻿# CMakeList.txt: проект CMake для otus-hw3; включите исходный код и определения,
-# укажите здесь логику для конкретного проекта.
-#
-cmake_minimum_required (VERSION 3.8)
+﻿cmake_minimum_required (VERSION 3.8)
 
 # Enable Hot Reload for MSVC compilers if supported.
 if (POLICY CMP0141)
@@ -11,11 +8,31 @@ endif()
 
 project ("otus-hw3")
 
-# Добавьте источник в исполняемый файл этого проекта.
+add_subdirectory(vendor/googletest)
+
 add_executable (ip_filter "ip_filter.cpp")
+
+if(MSVC)
+    # @see https://github.com/google/googletest/blob/v1.8.x/googletest/README.md
+    # Visual Studio Dynamic vs Static Runtimes
+    set(gtest_force_shared_crt ON CACHE BOOL "Always use msvcrt.dll" FORCE)
+endif()
 
 if (CMAKE_VERSION VERSION_GREATER 3.12)
   set_property(TARGET ip_filter PROPERTY CXX_STANDARD 20)
 endif()
 
-# TODO: Добавьте тесты и целевые объекты, если это необходимо.
+enable_testing()
+
+add_executable(
+    test_filter
+    "test_filter.cpp"
+)
+
+target_link_libraries(
+    test_filter
+    gtest
+    gtest_main
+)
+
+add_test(test_filter test_filter)
