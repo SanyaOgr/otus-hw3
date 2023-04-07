@@ -10,7 +10,7 @@
 // ("11.", '.') -> ["11", ""]
 // (".11", '.') -> ["", "11"]
 // ("11.22", '.') -> ["11", "22"]
-std::vector<std::string> split(const std::string &str, char d)
+auto split(const std::string &str, char d)
 {
     auto r = std::vector<std::string>{};
 
@@ -41,8 +41,17 @@ int main(int argc, char const *argv[])
             ip_pool.push_back(split(v.at(0), '.'));
         }
 
-        // TODO reverse lexicographically sort
+        // Reverse lexicographically sort
+        std::sort(ip_pool.begin(), ip_pool.end(), [](auto&& lhs, auto&& rhs){
+            for (int i = 0; i < 4; ++i)
+            {
+                if (lhs[i] == rhs[i]) continue;
+                return std::greater<decltype(lhs[i])>{}(lhs[i], rhs[i]);
+            }
+            return false;
+        });
 
+        // Print
         for(auto ip = ip_pool.cbegin(); ip != ip_pool.cend(); ++ip)
         {
             for(auto ip_part = ip->cbegin(); ip_part != ip->cend(); ++ip_part)
