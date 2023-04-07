@@ -63,6 +63,15 @@ auto print(const IpPoolType& ip_pool)
     }
 }
 
+auto filter(const IpPoolType& ip_pool, int first_part)
+{
+    auto startIt = std::lower_bound(ip_pool.cbegin(), ip_pool.cend(), IpType{ std::to_string(first_part), "0", "0", "0" }, ipPartialGreaterComp<0, 1>);
+    auto endIt = std::upper_bound(ip_pool.cbegin(), ip_pool.cend(), IpType{ std::to_string(first_part), "0", "0", "0" }, ipPartialGreaterComp<0, 1>);
+
+    return IpPoolType(startIt, endIt);
+}
+
+
 int main(int argc, char const *argv[])
 {
     try
@@ -89,8 +98,9 @@ int main(int argc, char const *argv[])
         // 1.29.168.152
         // 1.1.234.8
 
-        // TODO filter by first byte and output
-        // ip = filter(1)
+        // Filter by first byte and output
+        auto ip = filter(ip_pool, 1);
+        print(ip);
 
         // 1.231.69.33
         // 1.87.203.225
