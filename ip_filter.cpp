@@ -47,6 +47,22 @@ auto split(const std::string &str, char d)
     return r;
 }
 
+auto print(const IpPoolType& ip_pool)
+{
+    for (auto ip = ip_pool.cbegin(); ip != ip_pool.cend(); ++ip)
+    {
+        for (auto ip_part = ip->cbegin(); ip_part != ip->cend(); ++ip_part)
+        {
+            if (ip_part != ip->cbegin())
+            {
+                std::cout << ".";
+            }
+            std::cout << *ip_part;
+        }
+        std::cout << std::endl;
+    }
+}
+
 int main(int argc, char const *argv[])
 {
     try
@@ -63,18 +79,7 @@ int main(int argc, char const *argv[])
         std::sort(ip_pool.begin(), ip_pool.end(), ipGreaterComp);
 
         // Print
-        for(auto ip = ip_pool.cbegin(); ip != ip_pool.cend(); ++ip)
-        {
-            for(auto ip_part = ip->cbegin(); ip_part != ip->cend(); ++ip_part)
-            {
-                if (ip_part != ip->cbegin())
-                {
-                    std::cout << ".";
-                }
-                std::cout << *ip_part;
-            }
-            std::cout << std::endl;
-        }
+        print(ip_pool);
 
         // 222.173.235.246
         // 222.130.177.64
