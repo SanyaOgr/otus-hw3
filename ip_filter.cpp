@@ -10,9 +10,24 @@
 // ("11.", '.') -> ["11", ""]
 // (".11", '.') -> ["", "11"]
 // ("11.22", '.') -> ["11", "22"]
+
+using IpType = std::vector<std::string>;
+
+using IpPoolType = std::vector<IpType>;
+
+auto ipGreaterComp(const IpType& lhs, const IpType& rhs)
+{
+    for (int i = 0; i < 4; ++i)
+    {
+        if (lhs[i] == rhs[i]) continue;
+        return std::greater<decltype(lhs[i])>{}(lhs[i], rhs[i]);
+    }
+    return false;
+}
+
 auto split(const std::string &str, char d)
 {
-    auto r = std::vector<std::string>{};
+    auto r = IpType{};
 
     auto start = std::string::size_type{};
     auto stop = str.find_first_of(d);
@@ -33,7 +48,7 @@ int main(int argc, char const *argv[])
 {
     try
     {
-        auto ip_pool = std::vector<std::vector<std::string>>{};
+        auto ip_pool = IpPoolType{};
 
         for(std::string line; std::getline(std::cin, line);)
         {
@@ -42,14 +57,7 @@ int main(int argc, char const *argv[])
         }
 
         // Reverse lexicographically sort
-        std::sort(ip_pool.begin(), ip_pool.end(), [](auto&& lhs, auto&& rhs){
-            for (int i = 0; i < 4; ++i)
-            {
-                if (lhs[i] == rhs[i]) continue;
-                return std::greater<decltype(lhs[i])>{}(lhs[i], rhs[i]);
-            }
-            return false;
-        });
+        std::sort(ip_pool.begin(), ip_pool.end(), ipGreaterComp);
 
         // Print
         for(auto ip = ip_pool.cbegin(); ip != ip_pool.cend(); ++ip)
