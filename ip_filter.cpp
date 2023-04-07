@@ -15,18 +15,18 @@ using IpType = std::vector<std::string>;
 
 using IpPoolType = std::vector<IpType>;
 
-template<int startIndex, int endIndex>
-auto ipPartialGreaterComp(const IpType& lhs, const IpType& rhs)
+template<std::size_t startIndex, std::size_t endIndex>
+auto ipLexPartialGreaterComp(const IpType& lhs, const IpType& rhs) 
 {
-    for (int i = startIndex; i < endIndex; ++i)
-    {
-        if (lhs[i] == rhs[i]) continue;
-        return std::greater<decltype(lhs[i])>{}(lhs[i], rhs[i]);
-    }
-    return false;
+    return std::lexicographical_compare(
+        lhs.cbegin() + startIndex, lhs.cbegin() + endIndex, 
+        rhs.cbegin() + startIndex, rhs.cbegin() + endIndex,
+        [](auto&& lhs, auto&& rhs) {
+            return std::greater{}(std::stoi(lhs), std::stoi(rhs));
+        });
 }
 
-auto ipGreaterComp = ipPartialGreaterComp<0, 4>;
+auto ipLexGreaterComp = ipLexPartialGreaterComp<0, 4>;
 
 auto split(const std::string &str, char d)
 {
@@ -65,39 +65,37 @@ auto print(const IpPoolType& ip_pool)
 
 auto filter(const IpPoolType& ip_pool, int first_part)
 {
-    auto startIt = std::lower_bound(ip_pool.cbegin(), ip_pool.cend(), 
-        IpType{ std::to_string(first_part), "0", "0", "0" }, ipPartialGreaterComp<0, 1>);
+    auto val = IpType{ std::to_string(first_part) };
 
-    auto endIt = std::upper_bound(ip_pool.cbegin(), ip_pool.cend(), 
-        IpType{ std::to_string(first_part), "0", "0", "0" }, ipPartialGreaterComp<0, 1>);
+    auto startIt = std::lower_bound(ip_pool.cbegin(), ip_pool.cend(), val, ipLexPartialGreaterComp<0, 1>);
+
+    auto endIt = std::upper_bound(ip_pool.cbegin(), ip_pool.cend(), val, ipLexPartialGreaterComp<0, 1>);
 
     return IpPoolType(startIt, endIt);
 }
 
 auto filter(const IpPoolType& ip_pool, int first_part, int second_part)
 {
-    auto startIt = std::lower_bound(ip_pool.cbegin(), ip_pool.cend(), 
-        IpType{ std::to_string(first_part), std::to_string(second_part), "0", "0" }, ipPartialGreaterComp<0, 2>);
+    auto val = IpType{ std::to_string(first_part), std::to_string(second_part) };
 
-    auto endIt = std::upper_bound(ip_pool.cbegin(), ip_pool.cend(), 
-        IpType{ std::to_string(first_part), std::to_string(second_part), "0", "0" }, ipPartialGreaterComp<0, 2>);
+    auto startIt = std::lower_bound(ip_pool.cbegin(), ip_pool.cend(), val, ipLexPartialGreaterComp<0, 2>);
 
+    auto endIt = std::upper_bound(ip_pool.cbegin(), ip_pool.cend(), val, ipLexPartialGreaterComp<0, 2>);
+    
     return IpPoolType(startIt, endIt);
 }
 
 auto filter_any(const IpPoolType& ip_pool, int any_part)
-{
-    auto any_part_equals_pred = [val = std::to_string(any_part)](auto&& ip) {
-        for (auto part : ip)
-        {
-            if (part == val)
-                return true;
-        }
-        return false;
-    };
-    
+{   
     auto r = IpPoolType{};
-    std::copy_if(ip_pool.cbegin(), ip_pool.cend(), std::back_inserter(r), any_part_equals_pred);
+
+    auto val = std::to_string(any_part);
+
+    std::copy_if(ip_pool.cbegin(), ip_pool.cend(), std::back_inserter(r), [val](auto&& ip) {
+        return std::any_of(ip.cbegin(), ip.cend(), [val](auto&& part) {
+            return part == val;
+        });
+    });
 
     return r;
 }
@@ -115,7 +113,7 @@ int main(int argc, char const *argv[])
         }
 
         // Reverse lexicographically sort
-        std::sort(ip_pool.begin(), ip_pool.end(), ipGreaterComp);
+        std::sort(ip_pool.begin(), ip_pool.end(), ipLexGreaterComp);
 
         // Print
         print(ip_pool);
