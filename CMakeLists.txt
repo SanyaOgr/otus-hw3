@@ -8,9 +8,12 @@ endif()
 
 project ("otus-hw3")
 
-add_subdirectory(vendor/googletest)
-
 add_executable (ip_filter "ip_filter.cpp")
+
+if (CMAKE_VERSION VERSION_GREATER 3.12)
+  set_property(TARGET ip_filter PROPERTY CXX_STANDARD 20)
+endif()
+
 
 if(MSVC)
     # @see https://github.com/google/googletest/blob/v1.8.x/googletest/README.md
@@ -18,9 +21,7 @@ if(MSVC)
     set(gtest_force_shared_crt ON CACHE BOOL "Always use msvcrt.dll" FORCE)
 endif()
 
-if (CMAKE_VERSION VERSION_GREATER 3.12)
-  set_property(TARGET ip_filter PROPERTY CXX_STANDARD 20)
-endif()
+add_subdirectory(vendor/googletest)
 
 enable_testing()
 
