@@ -15,15 +15,18 @@ using IpType = std::vector<std::string>;
 
 using IpPoolType = std::vector<IpType>;
 
-auto ipGreaterComp(const IpType& lhs, const IpType& rhs)
+template<int startIndex, int endIndex>
+auto ipPartialGreaterComp(const IpType& lhs, const IpType& rhs)
 {
-    for (int i = 0; i < 4; ++i)
+    for (int i = startIndex; i < endIndex; ++i)
     {
         if (lhs[i] == rhs[i]) continue;
         return std::greater<decltype(lhs[i])>{}(lhs[i], rhs[i]);
     }
     return false;
 }
+
+auto ipGreaterComp = ipPartialGreaterComp<0, 4>;
 
 auto split(const std::string &str, char d)
 {
